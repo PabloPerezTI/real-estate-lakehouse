@@ -10,6 +10,8 @@ def csv_houses_madrid():
         .option("cloudFiles.format","csv")
         .option("header","true")
         .load("/Volumes/re_dev/bronze/data_inputs/initial_load/")
+        .select("*", 
+                col("_metadata.file_path").alias("_source_file"), current_timestamp().alias("_ingested_at"))
     )
 
 @dp.table(name="events_price_changed")
@@ -20,6 +22,10 @@ def events_price_changed():
         .option("cloudFiles.format","json")
         .option("cloudFiles.schemaHints","event_ts TIMESTAMP, listing_id INTEGER, old_price INTEGER, new_price INTEGER")
         .load("s3://real-estate-lakehouse-s3/landing/events/price_changed/")
-        .select("*", col("_metadata.file_path").alias("_source_file"), current_timestamp().alias("_ingested_at"))
+        .select("*", 
+                col("_metadata.file_path").alias("_source_file"), current_timestamp().alias("_ingested_at"),
+                col("_metadata.file_modification_time").alias("_source_file_modification_time")
+                )
+        
     )
 
