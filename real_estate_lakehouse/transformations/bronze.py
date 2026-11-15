@@ -10,6 +10,8 @@ def csv_houses_madrid():
         .option("cloudFiles.format","csv")
         .option("header","true")
         .load("/Volumes/re_dev/bronze/data_inputs/initial_load/")
+        .select("*", 
+                col("_metadata.file_path").alias("_source_file"), current_timestamp().alias("_ingested_at"))
     )
 
 @dp.table(name="events_price_changed")

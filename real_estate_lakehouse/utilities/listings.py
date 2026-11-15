@@ -9,6 +9,7 @@ from pyspark.sql import functions as F
 
 LISTING_COLUMN_TYPES = {
     "listing_id": "INT",
+    "source_listing_id": "INT",
     "title": "STRING",
     "subtitle": "STRING",
     "sq_mt_built": "DOUBLE",
@@ -68,7 +69,7 @@ LISTING_COLUMN_TYPES = {
 }
 
 METADATA_COLUMNS = ["_rescued_data", "_source_file", "_ingested_at"]
-IGNORED_SOURCE_COLUMNS = {"_c0"}
+IGNORED_SOURCE_COLUMNS = {}
 
 PRICE_FLAGS = {
     "buy_price": "is_buy_price_known",
@@ -96,7 +97,8 @@ def cast_listing_columns(df: DataFrame) -> DataFrame:
     not know, so a schema change in the source never goes unnoticed.
     """
     df = df.withColumnRenamed("id", "listing_id")
-    known = set(LISTING_COLUMN_TYPES) | set(METADATA_COLUMNS) | IGNORED_SOURCE_COLUMNS
+    df = df.withColumnRenamed("id_pisos", "source_listing_id")
+    known = set(LISTING_COLUMN_TYPES) | set(METADATA_COLUMNS) # | IGNORED_SOURCE_COLUMNS
     unexpected = set(df.columns) - known
     if unexpected:
         raise ValueError(f"Unexpected columns in bronze listings: {sorted(unexpected)}")
