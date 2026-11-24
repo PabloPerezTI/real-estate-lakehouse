@@ -1,0 +1,16 @@
+bundle:
+  name: databricks
+
+include:
+  - resources/*.yml
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace: 
+      host: "https://dbc-9b1dd76d-486a.cloud.databricks.com"
+
+
+
+      

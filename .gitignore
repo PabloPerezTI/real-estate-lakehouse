@@ -3,3 +3,4 @@ data/
 .venv
 simulator/output/
 simulator/state.json
+.databricks/

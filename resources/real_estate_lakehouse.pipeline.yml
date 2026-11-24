@@ -1,0 +1,14 @@
+resources:
+  pipelines:
+    real_estate_lakehouse:
+      name: real_estate_lakehouse
+      libraries:
+      - glob:
+          include: ../real_estate_lakehouse/transformations/**
+      catalog: re_dev
+      channel: CURRENT
+      continuous: false
+      photon: true
+      root_path: ../real_estate_lakehouse
+      schema: bronze
+      serverless: true
