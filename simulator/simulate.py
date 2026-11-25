@@ -26,8 +26,8 @@ DROP_PROBABILITY = 0.02
 MIN_DROP = 0.02
 MAX_DROP = 0.08
 
-EVENT_TYPE = "cambio_precio"
-LANDING_PREFIX = "landing/eventos"
+EVENT_TYPE = "price_changed"
+LANDING_PREFIX = "landing/events"
 
 
 def is_true(value) -> bool:
@@ -47,7 +47,7 @@ def read_source(path: Path) -> pd.DataFrame:
 def load_listings(source_path: Path) -> list[tuple[int, int]]:
     """
     Read the source file and return the for-sale listings with a known
-    price as (anuncio_id, price) tuples, using native Python ints so they
+    price as (listing_id, price) tuples, using native Python ints so they
     can be serialised to JSON.
     """
     df = read_source(source_path)
@@ -66,7 +66,7 @@ def init_state(source_path: Path, start_date: date) -> dict:
     """
     return {
         "last_simulated_day": (start_date - timedelta(days=1)).isoformat(),
-        "prices": {str(anuncio_id): price for anuncio_id, price in load_listings(source_path)},
+        "prices": {str(listing_id): price for listing_id, price in load_listings(source_path)},
     }
 
 
@@ -98,7 +98,7 @@ def day_rng(day: date) -> random.Random:
 def generate_price_drops(listings: list[tuple[int, int]], day: date, rng: random.Random) -> list[dict]:
     """
     Pure logic, no I/O: pick a random share of the listings, lower their
-    price within the configured range and return one cambio_precio event
+    price within the configured range and return one price_changed event
     per drop, sorted by event time. The event_id comes from the seeded
     generator so the output is reproducible.
     """
@@ -107,7 +107,7 @@ def generate_price_drops(listings: list[tuple[int, int]], day: date, rng: random
     midnight = datetime.combine(day, datetime.min.time())
 
     events = []
-    for anuncio_id, old_price in chosen:
+    for listing_id, old_price in chosen:
         drop = rng.uniform(MIN_DROP, MAX_DROP)
         new_price = min(round(old_price * (1 - drop)), old_price - 1)
         event_time = midnight + timedelta(seconds=rng.randint(0, 86_399))
@@ -116,9 +116,9 @@ def generate_price_drops(listings: list[tuple[int, int]], day: date, rng: random
             "event_id": str(uuid.UUID(int=rng.getrandbits(128), version=4)),
             "event_type": EVENT_TYPE,
             "event_ts": event_time.strftime("%Y-%m-%dT%H:%M:%SZ"),
-            "anuncio_id": anuncio_id,
-            "precio_anterior": old_price,
-            "precio_nuevo": new_price,
+            "listing_id": listing_id,
+            "old_price": old_price,
+            "new_price": new_price,
         })
 
     events.sort(key=lambda e: e["event_ts"])
@@ -128,7 +128,7 @@ def generate_price_drops(listings: list[tuple[int, int]], day: date, rng: random
 def apply_events(state: dict, events: list[dict], day: date) -> None:
     """Update the current prices and the last simulated day in the state."""
     for event in events:
-        state["prices"][str(event["anuncio_id"])] = event["precio_nuevo"]
+        state["prices"][str(event["listing_id"])] = event["new_price"]
     state["last_simulated_day"] = day.isoformat()
 
 
@@ -150,7 +150,7 @@ def write_jsonl(events: list[dict], path: Path) -> None:
 
 def upload_to_s3(local_path: Path, bucket: str, profile: str) -> str:
     """
-    Upload the file to landing/eventos/<event_type>/ using the given AWS CLI
+    Upload the file to landing/events/<event_type>/ using the given AWS CLI
     profile. Credentials are read from the local AWS configuration, never
     from the code. Returns the S3 URI of the uploaded object.
     """
