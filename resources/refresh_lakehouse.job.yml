@@ -1,0 +1,11 @@
+resources:
+  jobs:
+    refresh_lakehouse:
+      name: refresh_lakehouse
+      trigger:
+        file_arrival:
+          url: s3://real-estate-lakehouse-s3/landing/events/
+      tasks:
+        - task_key: run_pipeline
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.real_estate_lakehouse.id} 

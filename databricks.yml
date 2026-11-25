@@ -10,7 +10,3 @@ targets:
     default: true
     workspace: 
       host: "https://dbc-9b1dd76d-486a.cloud.databricks.com"
-
-
-
-      
