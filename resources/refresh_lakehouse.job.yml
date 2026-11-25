@@ -8,4 +8,4 @@ resources:
       tasks:
         - task_key: run_pipeline
           pipeline_task:
-            pipeline_id: ${resources.pipelines.real_estate_lakehouse.id} 
+            pipeline_id: ${resources.pipelines.real_estate_lakehouse.id}

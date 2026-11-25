@@ -29,7 +29,7 @@ def listings_evaluated():
     )
 
 # Table Listings
-@dp.table(name="re_dev.silver.listings")
+@dp.table(name="silver.listings")
 def listings():
     return (
         spark.readStream.table("listings_evaluated")
@@ -38,7 +38,7 @@ def listings():
     )
  
  
-@dp.table(name="re_dev.silver.listings_quarantine")
+@dp.table(name="silver.listings_quarantine")
 def listings_quarantine():
     return (
         spark.readStream.table("listings_evaluated")
@@ -46,7 +46,7 @@ def listings_quarantine():
     )
 
 # Table Price Changes
-@dp.table(name="re_dev.silver.price_changes")
+@dp.table(name="silver.price_changes")
 def price_changes():
     """Valid price change events: they pass every quarantine rule."""
     return (
@@ -56,7 +56,7 @@ def price_changes():
     )
  
  
-@dp.table(name="re_dev.silver.price_changes_quarantine")
+@dp.table(name="silver.price_changes_quarantine")
 def price_changes_quarantine():
     """Rejected price change events, with the rules each one breaks."""
     return (

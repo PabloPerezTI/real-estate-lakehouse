@@ -1,6 +1,6 @@
 import pyspark.pipelines as dp
 from pyspark.sql.functions import col, current_timestamp
-
+initial_load_path = spark.conf.get("initial_load_path")
 
 @dp.table(name="csv_houses_madrid")
 def csv_houses_madrid():
@@ -9,7 +9,7 @@ def csv_houses_madrid():
         .format("cloudFiles")
         .option("cloudFiles.format","csv")
         .option("header","true")
-        .load("/Volumes/re_dev/bronze/data_inputs/initial_load/")
+        .load(initial_load_path)
         .select("*", 
                 col("_metadata.file_path").alias("_source_file"), current_timestamp().alias("_ingested_at"))
     )

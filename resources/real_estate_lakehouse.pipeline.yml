@@ -5,10 +5,12 @@ resources:
       libraries:
       - glob:
           include: ../real_estate_lakehouse/transformations/**
-      catalog: re_dev
+      catalog: ${var.catalog}
       channel: CURRENT
       continuous: false
       photon: true
       root_path: ../real_estate_lakehouse
       schema: bronze
       serverless: true
+      configuration:
+        initial_load_path: /Volumes/${var.catalog}/bronze/data_inputs/initial_load/

@@ -4,9 +4,21 @@ bundle:
 include:
   - resources/*.yml
 
+variables:
+  catalog:
+    description: Unity Catalog catalog the pipeline writes to
+
 targets:
   dev:
     mode: development
     default: true
     workspace: 
       host: "https://dbc-9b1dd76d-486a.cloud.databricks.com"
+    variables:
+      catalog: re_dev
+  prod:
+    mode: production
+    workspace:
+      host: "https://dbc-9b1dd76d-486a.cloud.databricks.com"
+    variables:
+      catalog: re_prod
